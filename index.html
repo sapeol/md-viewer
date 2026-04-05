@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" media="(prefers-color-scheme: dark)" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -283,6 +284,14 @@
       border-color: var(--accent);
     }
     .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+    .btn-success {
+      background: #1a7f37; color: #fff; border-color: #1a7f37;
+    }
+    .btn-success:hover { background: #2ea043; border-color: #2ea043; }
+    @media (prefers-color-scheme: dark) {
+      .btn-success { background: #238636; border-color: #238636; }
+      .btn-success:hover { background: #2ea043; border-color: #2ea043; }
+    }
 
     /* ── Markdown body ── */
     main {
@@ -443,10 +452,16 @@
     </div>
     <div class="or-divider">or paste markdown</div>
     <textarea class="paste-area" id="paste-area" placeholder="# Hello World&#10;&#10;Paste your markdown content here..."></textarea>
-    <button class="btn" id="render-paste-btn">
-      <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 0 1-.927-.928l.929-3.25c.081-.286.235-.547.445-.758l8.61-8.61Zm.176 4.823L9.75 4.81l-6.286 6.287a.253.253 0 0 0-.064.108l-.558 1.953 1.953-.558a.253.253 0 0 0 .108-.064Zm1.238-3.763a.25.25 0 0 0-.354 0L10.811 3.75l1.439 1.44 1.263-1.263a.25.25 0 0 0 0-.354Z"/></svg>
-      Render
-    </button>
+    <div style="display:flex; gap:8px;">
+      <button class="btn" id="render-paste-btn">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M11.013 1.427a1.75 1.75 0 0 1 2.474 0l1.086 1.086a1.75 1.75 0 0 1 0 2.474l-8.61 8.61c-.21.21-.47.364-.756.445l-3.251.93a.75.75 0 0 1-.927-.928l.929-3.25c.081-.286.235-.547.445-.758l8.61-8.61Zm.176 4.823L9.75 4.81l-6.286 6.287a.253.253 0 0 0-.064.108l-.558 1.953 1.953-.558a.253.253 0 0 0 .108-.064Zm1.238-3.763a.25.25 0 0 0-.354 0L10.811 3.75l1.439 1.44 1.263-1.263a.25.25 0 0 0 0-.354Z"/></svg>
+        Render
+      </button>
+      <button class="btn btn-success" id="share-paste-btn">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M9 2.219V4.5A4.5 4.5 0 0 0 4.5 9H2.25a.75.75 0 0 1 0-1.5H4.5a3 3 0 0 1 3-3V6.78l-1.795-1.795a.75.75 0 1 1 1.06-1.06L9 5.57l2.235-2.644a.75.75 0 1 1 1.06 1.06L10.5 6.78V4.5a3 3 0 0 1 3 3h2.25a.75.75 0 0 1 0 1.5H13.5A4.5 4.5 0 0 0 9 4.5V2.219Z"/></svg>
+        Render & Share
+      </button>
+    </div>
   </div>
 
   <!-- App -->
@@ -462,6 +477,10 @@
         <span class="source-badge" id="source-badge">URL</span>
         <div class="url-display" id="url-display" title="Click to copy"></div>
         <div class="header-actions">
+          <button class="btn" id="share-btn" title="Copy shareable link">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M9 2.219V4.5A4.5 4.5 0 0 0 4.5 9H2.25a.75.75 0 0 1 0-1.5H4.5a3 3 0 0 1 3-3V6.78l-1.795-1.795a.75.75 0 1 1 1.06-1.06L9 5.57l2.235-2.644a.75.75 0 1 1 1.06 1.06L10.5 6.78V4.5a3 3 0 0 1 3 3h2.25a.75.75 0 0 1 0 1.5H13.5A4.5 4.5 0 0 0 9 4.5V2.219Z"/></svg>
+            Share
+          </button>
           <button class="btn" id="raw-btn" title="Open raw">
             <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M3.75 2h3.5a.75.75 0 0 1 0 1.5h-3.5a.25.25 0 0 0-.25.25v8.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-3.5a.75.75 0 0 1 1.5 0v3.5A1.75 1.75 0 0 1 12.25 14h-8.5A1.75 1.75 0 0 1 2 12.25v-8.5C2 2.784 2.784 2 3.75 2Zm6.854-1h4.146a.25.25 0 0 1 .25.25v4.146a.25.25 0 0 1-.427.177L13.03 4.03 9.28 7.78a.75.75 0 0 1-1.06-1.06l3.75-3.75-1.543-1.543A.25.25 0 0 1 10.604 1Z"/></svg>
             Raw
@@ -494,12 +513,14 @@
     const $errMsg     = document.getElementById('error-msg');
     const $errDet     = document.getElementById('error-detail');
     const $toast      = document.getElementById('toast');
+    const $shareBtn   = document.getElementById('share-btn');
     const $rawBtn     = document.getElementById('raw-btn');
     const $copyBtn    = document.getElementById('copy-btn');
     const $badge      = document.getElementById('source-badge');
 
     let rawMarkdown = '';
     let currentUrl = '';
+    let isShared = false;
 
     // ── Toast ──
     function showToast(msg, dur = 2000) {
@@ -529,6 +550,10 @@
       const v = $pasteArea.value.trim();
       if (v) renderContent(v, 'pasted content');
     });
+    document.getElementById('share-paste-btn').addEventListener('click', () => {
+      const v = $pasteArea.value.trim();
+      if (v) renderContent(v, 'shared content', true);
+    });
 
     // ── Error paste fallback ──
     document.getElementById('paste-fallback-btn').addEventListener('click', showPasteModal);
@@ -543,7 +568,21 @@
     }
 
     // ── Header actions ──
-    $urlDisp.addEventListener('click', () => copyText(currentUrl));
+    $urlDisp.addEventListener('click', () => {
+      if (isShared) copyText(window.location.href);
+      else copyText(currentUrl);
+    });
+    $shareBtn.addEventListener('click', () => {
+      const shareUrl = generateShareLink(rawMarkdown);
+      history.replaceState(null, '', shareUrl);
+      isShared = true;
+      $urlDisp.textContent = shareUrl;
+      $urlDisp.title = shareUrl;
+      $badge.textContent = 'Shared';
+      $rawBtn.style.display = 'none';
+      copyText(shareUrl);
+      showToast('Shareable link copied!');
+    });
     $rawBtn.addEventListener('click', () => { if (currentUrl) window.open(currentUrl, '_blank'); });
     $copyBtn.addEventListener('click', () => copyText(rawMarkdown));
 
@@ -571,7 +610,18 @@
     ];
 
     // ── Show content ──
-    function renderContent(md, source) {
+    function generateShareLink(md) {
+      const compressed = LZString.compressToEncodedURIComponent(md);
+      return `${location.origin}${location.pathname}#md=${compressed}`;
+    }
+
+    function decodeShareLink(hash) {
+      const prefix = '#md=';
+      if (!hash.startsWith(prefix)) return null;
+      return LZString.decompressFromEncodedURIComponent(hash.slice(prefix.length));
+    }
+
+    function renderContent(md, source, shouldShare = false) {
       rawMarkdown = md;
       $content.innerHTML = marked.parse(md);
       $loader.style.display = 'none';
@@ -579,10 +629,24 @@
       $landing.style.display = 'none';
       $app.style.display = 'block';
 
-      $urlDisp.textContent = source;
-      $urlDisp.title = source;
-      $badge.textContent = source === 'pasted content' ? 'Pasted' : 'URL';
-      $rawBtn.style.display = (source === 'pasted content') ? 'none' : '';
+      if (shouldShare) {
+        const shareUrl = generateShareLink(md);
+        history.replaceState(null, '', shareUrl);
+        currentUrl = shareUrl;
+        isShared = true;
+        $urlDisp.textContent = shareUrl;
+        $urlDisp.title = shareUrl;
+        $badge.textContent = 'Shared';
+        $rawBtn.style.display = 'none';
+        showToast('Shareable link copied!');
+        copyText(shareUrl);
+      } else {
+        isShared = false;
+        $urlDisp.textContent = source;
+        $urlDisp.title = source;
+        $badge.textContent = source === 'pasted content' ? 'Pasted' : (source === 'shared content' ? 'Shared' : 'URL');
+        $rawBtn.style.display = (source === 'pasted content' || source === 'shared content') ? 'none' : '';
+      }
 
       const h1 = $content.querySelector('h1');
       if (h1) document.title = h1.textContent + ' — MD Viewer';
@@ -610,6 +674,16 @@
 
     // ── Main load ──
     async function load() {
+      // Check for shared content in hash first
+      const hash = location.hash;
+      if (hash.startsWith('#md=')) {
+        const decoded = decodeShareLink(hash);
+        if (decoded) {
+          renderContent(decoded, 'shared content');
+          return;
+        }
+      }
+
       if (!urlParam) { showLanding(); return; }
 
       currentUrl = urlParam;
